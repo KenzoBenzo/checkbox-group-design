@@ -106,7 +106,7 @@ const Home: NextPage = () => {
 	return (
 		<AppShell
 			variant='static'
-			height='240px'
+			height='100vh'
 			navbar={
 				<Flex
 					p={2}
@@ -126,7 +126,7 @@ const Home: NextPage = () => {
 				</Flex>
 			}
 			sidebar={
-				<Sidebar h='100vh'>
+				<Sidebar>
 					<SidebarSection>
 						<NavItem label='Home' />
 						<NavItem label='Settings' />

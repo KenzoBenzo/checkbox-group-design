@@ -76,7 +76,7 @@ export const CheckboxGroup = ({
 
 	return (
 		<>
-			<Flex>
+			<Flex role='group'>
 				<IconButton
 					onClick={onToggle}
 					aria-label='Open indicator'
@@ -119,6 +119,8 @@ export const CheckboxGroup = ({
 						return (
 							<Checkbox
 								key={checkbox.label + name}
+								role='treeitem'
+								aria-labelledby={name + " " + checkbox.label}
 								isChecked={checkedItems[index]}
 								onChange={(event) =>
 									onChangeCheckbox({ event, label: checkbox.label })
