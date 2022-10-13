@@ -92,6 +92,17 @@ const Home: NextPage = () => {
 		});
 	};
 
+	// Get the default data for checkboxes
+	const defaultCheckboxValues = checkboxGroups.reduce(
+		(a, v) => ({
+			...a,
+			[v.groupLabel]: v.children
+				.sort((a, b) => a.label.localeCompare(b.label))
+				.map((mappedGroup) => mappedGroup.isSelected),
+		}),
+		{}
+	);
+
 	return (
 		<AppShell
 			variant='static'
@@ -124,7 +135,17 @@ const Home: NextPage = () => {
 			}
 		>
 			<Box as='main' flex='1' p={4}>
-				<StepForm onSubmit={onSubmit}>
+				<StepForm
+					onSubmit={onSubmit}
+					defaultValues={{
+						...defaultCheckboxValues,
+						oneToTwo: 100,
+						twoToThree: 50,
+						threeToFour: 30,
+						fourToFive: 10,
+						fiveToSix: 2,
+					}}
+				>
 					<FormLayout>
 						<FormStepper orientation='vertical'>
 							{steps.map((args, i) => (
