@@ -30,7 +30,13 @@ const steps = [
 					return (
 						<CheckboxGroup
 							key={index + department.groupLabel}
-							group={department}
+							name={department.groupLabel}
+							options={department.children}
+							defaultValue={department.children
+								.sort((a, b) => a.label.localeCompare(b.label))
+								.map((mappedGroup) => {
+									return mappedGroup.isSelected;
+								})}
 						/>
 					);
 				})}

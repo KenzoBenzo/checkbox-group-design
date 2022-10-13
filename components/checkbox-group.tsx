@@ -44,14 +44,29 @@ export const CheckboxGroupType = z.object({
 export type CheckboxGroupInputType = z.input<typeof CheckboxGroupType>;
 export type CheckboxGroupType = z.infer<typeof CheckboxGroupType>;
 
-export const CheckboxGroup = ({ group }: { group: CheckboxGroupInputType }) => {
-	const { groupLabel, isCollapsed, children } = CheckboxGroupType.parse(group);
+export const CheckboxGroup = ({
+	name,
+	value,
+	defaultValue,
+	onChange,
+	options,
+	isCollapsed = true,
+}: {
+	name: CheckboxGroupInputType["groupLabel"];
+	value?: boolean[];
+	defaultValue?: boolean[];
+	options: CheckboxGroupInputType["children"];
+	onChange?: () => void;
+	isCollapsed?: boolean;
+}) => {
 	const [checkedItems, setCheckedItems] = React.useState(
-		children
-			.sort((a, b) => a.label.localeCompare(b.label))
-			.map((mappedGroup) => {
-				return mappedGroup.isSelected;
-			})
+		value ||
+			defaultValue ||
+			options
+				.sort((a, b) => a.label.localeCompare(b.label))
+				.map((mappedGroup) => {
+					return mappedGroup.isSelected;
+				})
 	);
 
 	const allChecked = checkedItems.every(Boolean);
@@ -77,12 +92,12 @@ export const CheckboxGroup = ({ group }: { group: CheckboxGroupInputType }) => {
 						setCheckedItems(checkedItems.map((item) => e.target.checked))
 					}
 				>
-					{groupLabel}
+					{name}
 				</Checkbox>
 			</Flex>
 			<Collapse in={isOpen}>
 				<Stack pl={12} mt={1} spacing={1}>
-					{children.map((checkbox, index) => {
+					{options.map((checkbox, index) => {
 						const onChangeCheckbox = ({
 							event,
 							label,
@@ -91,7 +106,7 @@ export const CheckboxGroup = ({ group }: { group: CheckboxGroupInputType }) => {
 							label: string;
 						}) => {
 							// find the index of the current checkbox, and invert the value, otherwise return it's proper value.
-							const updatedCheckboxes: boolean[] = children
+							const updatedCheckboxes: boolean[] = options
 								.sort((a, b) => a.label.localeCompare(b.label))
 								.map((item, index) =>
 									item.label === label
@@ -103,7 +118,7 @@ export const CheckboxGroup = ({ group }: { group: CheckboxGroupInputType }) => {
 						};
 						return (
 							<Checkbox
-								key={checkbox.label + group.groupLabel}
+								key={checkbox.label + name}
 								isChecked={checkedItems[index]}
 								onChange={(event) =>
 									onChangeCheckbox({ event, label: checkbox.label })
