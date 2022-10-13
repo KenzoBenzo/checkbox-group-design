@@ -7,6 +7,7 @@ import {
 	Loader,
 	Property,
 	PropertyList,
+	SelectField,
 	StepperCompleted,
 } from "@saas-ui/react";
 import {
@@ -17,7 +18,10 @@ import {
 	NextButton,
 	FormLayout,
 } from "@saas-ui/forms";
-import { CheckboxGroup } from "../components/checkbox-group";
+import {
+	CheckboxGroup,
+	CheckboxGroupField,
+} from "../components/checkbox-group";
 import checkboxGroups from "../example-data.json";
 
 const steps = [
@@ -28,15 +32,10 @@ const steps = [
 			<>
 				{checkboxGroups?.map((department, index) => {
 					return (
-						<CheckboxGroup
+						<CheckboxGroupField
 							key={index + department.groupLabel}
 							name={department.groupLabel}
 							options={department.children}
-							defaultValue={department.children
-								.sort((a, b) => a.label.localeCompare(b.label))
-								.map((mappedGroup) => {
-									return mappedGroup.isSelected;
-								})}
 						/>
 					);
 				})}

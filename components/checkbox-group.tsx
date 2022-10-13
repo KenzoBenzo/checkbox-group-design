@@ -6,6 +6,7 @@ import {
 	Flex,
 	HTMLChakraProps,
 	Stack,
+	useControllableState,
 	useDisclosure,
 	useFormControl,
 } from "@chakra-ui/react";
@@ -56,18 +57,14 @@ export const CheckboxGroup = ({
 	value?: boolean[];
 	defaultValue?: boolean[];
 	options: CheckboxGroupInputType["children"];
-	onChange?: () => void;
+	onChange?: (value: boolean[]) => void;
 	isCollapsed?: boolean;
 }) => {
-	const [checkedItems, setCheckedItems] = React.useState(
-		value ||
-			defaultValue ||
-			options
-				.sort((a, b) => a.label.localeCompare(b.label))
-				.map((mappedGroup) => {
-					return mappedGroup.isSelected;
-				})
-	);
+	const [checkedItems, setCheckedItems] = useControllableState({
+		value,
+		defaultValue,
+		onChange,
+	});
 
 	const allChecked = checkedItems.every(Boolean);
 	const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
