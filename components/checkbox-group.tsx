@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { IconButton } from "@saas-ui/react";
-import React, { ChangeEvent, FormEvent } from "react";
+import React, { ChangeEvent } from "react";
 import { z } from "zod";
 import { registerFieldType } from "@saas-ui/forms";
 import { CustomCheckboxIcon } from "./checkbox-icon";
@@ -24,7 +24,7 @@ export const CheckboxGroupType = z.object({
 	children: z.array(
 		z.object({
 			label: z.string(),
-			isSelected: z.boolean().optional().default(false),
+			value: z.string().min(1),
 			isDisabled: z.boolean().optional().default(false),
 		})
 	),
@@ -42,10 +42,10 @@ export const CheckboxGroup = ({
 	isCollapsed = true,
 }: {
 	name: CheckboxGroupInputType["groupLabel"];
-	value?: boolean[];
-	defaultValue?: boolean[];
+	value?: string[];
+	defaultValue?: string[];
 	options: CheckboxGroupInputType["children"];
-	onChange?: (value: boolean[]) => void;
+	onChange?: (value: string[]) => void;
 	isCollapsed?: boolean;
 }) => {
 	const [checkedItems, setCheckedItems] = useControllableState({
@@ -54,8 +54,8 @@ export const CheckboxGroup = ({
 		onChange,
 	});
 
-	const allChecked = checkedItems.every(Boolean);
-	const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
+	const allChecked = checkedItems?.length === options.length;
+	const isIndeterminate = checkedItems?.length > 0 && !allChecked;
 
 	const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: !isCollapsed });
 
@@ -73,8 +73,10 @@ export const CheckboxGroup = ({
 				<Checkbox
 					isChecked={allChecked}
 					isIndeterminate={isIndeterminate}
-					onChange={(e) =>
-						setCheckedItems(checkedItems.map((item) => e.target.checked))
+					onChange={(e: ChangeEvent<HTMLInputElement>) =>
+						setCheckedItems(
+							e.target.checked ? options.map((item) => item.value) : []
+						)
 					}
 				>
 					{name}
@@ -85,19 +87,21 @@ export const CheckboxGroup = ({
 					{options.map((checkbox, index) => {
 						const onChangeCheckbox = ({
 							event,
-							label,
+							value,
 						}: {
 							event: ChangeEvent<HTMLInputElement>;
-							label: string;
+							value: string;
 						}) => {
-							// find the index of the current checkbox, and invert the value, otherwise return it's proper value.
-							const updatedCheckboxes: boolean[] = options
-								.sort((a, b) => a.label.localeCompare(b.label))
-								.map((item, index) =>
-									item.label === label
-										? event.target.checked
-										: checkedItems[index]
-								);
+							// check if the value exists in the checkedItems array, and if it does, filter it out. If it doesn't add it. Sort at the end so that it goes in order of number level
+
+							// Clone the list of checked items
+							let newCheckedItems = [...checkedItems];
+							const updatedCheckboxes: string[] = (
+								checkedItems.find((item) => item == value)
+									? newCheckedItems.filter((item) => item !== value)
+									: [...newCheckedItems, value]
+							).sort((a, b) => a.localeCompare(b));
+
 							setCheckedItems(updatedCheckboxes);
 						};
 						return (
@@ -105,9 +109,13 @@ export const CheckboxGroup = ({
 								key={checkbox.label + name}
 								role='treeitem'
 								aria-labelledby={name + " " + checkbox.label}
-								isChecked={checkedItems[index]}
+								isChecked={
+									checkedItems.find((item) => item == checkbox.value)
+										? true
+										: false
+								}
 								onChange={(event) =>
-									onChangeCheckbox({ event, label: checkbox.label })
+									onChangeCheckbox({ event, value: checkbox.value })
 								}
 								isDisabled={checkbox.isDisabled}
 							>

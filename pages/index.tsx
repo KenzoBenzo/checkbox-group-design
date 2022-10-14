@@ -7,7 +7,6 @@ import {
 	Loader,
 	Property,
 	PropertyList,
-	SelectField,
 	StepperCompleted,
 } from "@saas-ui/react";
 import {
@@ -19,10 +18,21 @@ import {
 	FormLayout,
 } from "@saas-ui/forms";
 import {
-	CheckboxGroup,
 	CheckboxGroupField,
+	CheckboxGroupInputType,
 } from "../components/checkbox-group";
-import checkboxGroups from "../example-data.json";
+import scenarioSelected from "../raw-data.json";
+import departments from "../departments.json";
+
+type CheckBoxTreeType = CheckboxGroupInputType[];
+
+const checkboxGroups: CheckBoxTreeType = departments.map((department) => ({
+	groupLabel: department || "Department",
+	children: ["1", "2", "3", "4", "5"].map((level) => ({
+		label: `Level ${level}`,
+		value: `${department}__${level}`,
+	})),
+}));
 
 const steps = [
 	{
@@ -91,13 +101,13 @@ const Home: NextPage = () => {
 		});
 	};
 
-	// Get the default data for checkboxes
-	const defaultCheckboxValues = checkboxGroups.reduce(
+	const defaultCheckboxValues = departments.reduce(
 		(a, v) => ({
 			...a,
-			[v.groupLabel]: v.children
-				.sort((a, b) => a.label.localeCompare(b.label))
-				.map((mappedGroup) => mappedGroup.isSelected),
+			// @ts-ignore true types exist, this is bespoke to my system
+			[v]: scenarioSelected.promotionQualified?.filter((item) =>
+				item.includes(v)
+			),
 		}),
 		{}
 	);
