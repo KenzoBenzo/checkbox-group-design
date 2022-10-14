@@ -1,18 +1,15 @@
 import {
-	chakra,
 	Checkbox as ChakraCheckbox,
 	CheckboxProps,
 	Collapse,
 	Flex,
-	HTMLChakraProps,
 	Stack,
 	useControllableState,
 	useDisclosure,
-	useFormControl,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { IconButton } from "@saas-ui/react";
-import React, { FormEvent } from "react";
+import React, { ChangeEvent, FormEvent } from "react";
 import { z } from "zod";
 import { registerFieldType } from "@saas-ui/forms";
 import { CustomCheckboxIcon } from "./checkbox-icon";
@@ -32,15 +29,6 @@ export const CheckboxGroupType = z.object({
 		})
 	),
 });
-// .transform((group) => ({
-// 	groupLabel: group.groupLabel,
-// 	children: group.children.map((checkbox) => ({
-// 		label: checkbox.label,
-// 		isDisabled: checkbox.isDisabled,
-// 		isSelected: checkbox.isSelected,
-// 		value: `${group.groupLabel}-${checkbox.label.split(" ")[1]}`,
-// 	})),
-// }));
 
 export type CheckboxGroupInputType = z.input<typeof CheckboxGroupType>;
 export type CheckboxGroupType = z.infer<typeof CheckboxGroupType>;
@@ -99,7 +87,7 @@ export const CheckboxGroup = ({
 							event,
 							label,
 						}: {
-							event: FormEvent<HTMLInputElement>;
+							event: ChangeEvent<HTMLInputElement>;
 							label: string;
 						}) => {
 							// find the index of the current checkbox, and invert the value, otherwise return it's proper value.
@@ -107,8 +95,7 @@ export const CheckboxGroup = ({
 								.sort((a, b) => a.label.localeCompare(b.label))
 								.map((item, index) =>
 									item.label === label
-										? // @ts-ignore this is a tricky type
-										  event.target.checked
+										? event.target.checked
 										: checkedItems[index]
 								);
 							setCheckedItems(updatedCheckboxes);
